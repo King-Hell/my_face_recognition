@@ -3,7 +3,7 @@ import cv2
 from PIL import Image,ImageDraw,ImageFont
 import numpy as np
 
-'''从摄像头中识别人脸，基于face_recognition示例修改'''
+'''从摄像头中识别人脸，基于face_recognition示例'''
 
 def change_cv2_draw(image,strs,local,sizes):
     '''在图片中显示中文'''
@@ -73,7 +73,7 @@ while True:
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
         #绘制人名
         cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-        frame=change_cv2_draw(frame,name,(left + 10, bottom - 40),30
+        frame=change_cv2_draw(frame,name,(left + 10, bottom - 40),30)
     #显示结果图片
     cv2.imshow('Video', frame)
     #ESC键退出
