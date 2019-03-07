@@ -2,6 +2,8 @@ import face_recognition
 import cv2
 from PIL import Image,ImageDraw,ImageFont
 import numpy as np
+import os
+import sys
 
 '''从摄像头中识别人脸，基于face_recognition示例'''
 
@@ -16,26 +18,40 @@ def change_cv2_draw(image,strs,local,sizes):
     image = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
     return image
 
+def loadData(path):
+    encodings=[]
+    names=[]
+    for item in os.listdir(path):
+        if os.path.isfile(path+item):
+            #加载人脸图片
+            image=face_recognition.load_image_file(path+item)
+            encoding=face_recognition.face_encodings(image)[0]
+            encodings.append(encoding)
+            name=item.split(".")[0]
+            names.append(name)
+    return encodings,names
+
 #获取摄像头数据
 video_capture = cv2.VideoCapture(0)#0为默认摄像头
-
-#加载人脸图片
-test_image = face_recognition.load_image_file("奥巴马.jpg")
-test_face_encoding = face_recognition.face_encodings(test_image)[0]
+if not video_capture.isOpened():
+    print("摄像头开启失败")
+    input("")
+    exit(-1)
 
 #生成人脸编码数组
-known_face_encodings = [
-    test_face_encoding
-]
-known_face_names = [
-    "奥巴马"
-]
+known_face_encodings,known_face_names=loadData("photo/")
 
 #初始化
 face_locations = []
 face_encodings = []
 face_names = []
 process_this_frame = True
+
+#通过命令行参数传入识别容错度，默认为0.6
+if len(sys.argv)==2:
+    tolerance=sys.argv[1]
+else:
+    tolerance=0.6
 
 while True:
     #抓取一帧图片
@@ -52,7 +68,7 @@ while True:
         face_names = []
         for face_encoding in face_encodings:
             #与已有人脸编码比对
-            matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+            matches = face_recognition.compare_faces(known_face_encodings, face_encoding,tolerance)
             #matches = face_recognition.compare_faces(known_face_encodings, face_encoding,tolerance=0.39)
             name = "未知"
             #如果有多个匹配采用第一个
